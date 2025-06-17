@@ -1,0 +1,113 @@
+{
+    "name": "MDSTNet",
+
+    "arch": {
+        "type": "MDSTNet",
+        "args": {
+            "configs": {
+                "task_name": "forecast",
+                "seq_len": 24,
+                "label_len": 24,
+                "pred_len": 48,
+                "gat_node_features": 7,
+                "mete_features": 56,
+                "num_mete_token":1,
+                "num_aq_token":3,
+                "num_station_token":50,
+                "n_station":1628,
+                "e_layers": 3,
+                "d_layers": 3,
+                "enc_in": 7,
+                "time_c": 5,
+                "c_out": 7,
+                "d_model": 256 ,
+                "n_heads": 8 ,      
+                "embed": "timeF",
+                "freq": "h",
+                "dropout": 0.1,
+                "output_attention": true,
+                "use_norm":  false,
+                "use_fore": true ,
+                "use_mete": true ,
+                "spa": true ,
+                "pva": true ,
+                "class_strategy": "projection" ,
+                "activation": "gelu" ,
+
+                "d_ff": 1024 ,
+                "num_kernels": 6,
+                "factor": 6,
+                "top_k": 5
+            }
+        }
+    },
+    "train_loader": {
+        "type": "stsdataLoader",
+        "args":{
+            "data_dir": "/Datasets/ChinaAirNet/train_data.pkl",
+            "batch_size": 4,
+            "shuffle": true,
+            "num_workers": 8,
+            "training": true
+        }
+    },
+    "valid_loader": {
+            "type": "stsdataLoader",
+            "args":{
+                "data_dir": "/Datasets/ChinaAirNet/val_data.pkl",
+                "batch_size": 4,
+                "shuffle": false,
+                "num_workers": 8,
+                "training": false
+            }
+        },
+        "test_loader": {
+            "type": "stsdataLoader",
+            "args":{
+                "data_dir": "/Datasets/ChinaAirNet/val_data.pkl", 
+                "batch_size": 4,
+                "shuffle": false,
+                "num_workers": 0,
+                "training": false
+            }
+        },
+        "optimizer": {
+            "type": "Adam",
+            "args":{
+                "lr": 0.0001,
+                "weight_decay": 0,
+                "amsgrad": true
+            }
+        },
+        "loss": "MSELoss",
+        "metrics": [
+            "AQI_MAE_112",
+            "AQI_MAE_1324",
+            "AQI_MAE_2548",
+            "AQI_RMSE_112",
+            "AQI_RMSE_1324",
+            "AQI_RMSE_2548",
+            "AQI_MAE",
+            "AQI_RMSE"
+        ],
+        "lr_scheduler": {
+            "type": "StepLR",
+            "args": {
+                "step_size": 17,
+                "gamma": 0.5
+            }
+        },
+        "trainer": {
+            "epochs": 100,
+    
+            "save_dir": "/checkpoints/ablation/MDSTNet",
+            "save_period": 15,
+            "start_save_epoch":50 ,
+            "verbosity": 2,
+            
+            "monitor": "min val_AQI_MAE",
+            "early_stop": 50,
+            "tensorboard": true
+        }
+    }
+ 
